@@ -70,7 +70,7 @@ const OPTIONS_VULCANIZE = {
 	stripComments: true
 };
 
-const VALIDATOR_URL = 'http://validator.w3.org/nu';
+const VALIDATOR_URL = '//validator.w3.org/nu';
 
 function ifDev(fn, ...args) {
 	return util.env.production ? util.noop() : fn.apply(null, args);
@@ -100,10 +100,10 @@ gulp.task('build:scripts:modules', () => {
 	return browserify(OPTIONS_BROWSERIFY).bundle()
 		.pipe(sourceStream(PATHS.scripts.dest))
 		.pipe(buffer())
-		.pipe(sourcemaps.init({ loadMaps: true }))
+		.pipe(ifDev(sourcemaps.init, { loadMaps: true }))
 		.pipe(ifProd(babili))
 		.on('error', util.log)
-		.pipe(sourcemaps.write())
+		.pipe(ifDev(sourcemaps.write))
 		.pipe(gulp.dest(PATHS.dest.env));
 });
 
