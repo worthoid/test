@@ -169,8 +169,8 @@ gulp.task('tdd:single', done => {
 	}, () => done()).start();
 });
 
-gulp.task('test', done => {
-	runSequence('lint', 'tdd:single', done);
+gulp.task('test', done => { // prod only
+	runSequence('lint', 'validate', 'tdd:single', done);
 });
 
 gulp.task('test:watch', ['test', 'serve'], () => {
@@ -179,7 +179,7 @@ gulp.task('test:watch', ['test', 'serve'], () => {
 	gulp.watch(PATHS.styles, ['lint:styles']);
 });
 
-gulp.task('validate:markup', ['build:markup'], () => {
+gulp.task('validate', ['build'], () => {
 	return gulp.src(PATHS.validator.entrypoint)
 		.pipe(htmlValidator(OPTIONS_HTML_VALIDATOR))
 		.pipe(replace(/href="(?!http)/g, `href="${ VALIDATOR_URL }/`))
