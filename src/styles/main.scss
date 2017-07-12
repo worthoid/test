@@ -1,2 +1,10 @@
 @import "../elements/common/custom-elements-external";
 @import "../elements/demo-clock/demo-clock-external";
+
+body {
+	font-family: sans-serif;
+}
+
+demo-clock:not(:first-child) {
+	margin-left: 0.5em;
+}
