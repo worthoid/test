@@ -20,12 +20,13 @@ const sourceStream = require('vinyl-source-stream');
 
 const Server = require('karma').Server;
 
-const ENV = util.env.production ? 'prod' : 'dev';
+// const ENV = util.env.production ? 'prod' : 'dev';
 const PATHS = {
-	dest: {
-		all: 'build',
-		env: 'build/' + ENV
-	},
+	// dest: {
+	// 	all: 'build',
+	// 	env: 'build/' + ENV
+	// },
+	dest: 'build',
 	markup: {
 		all: 'src/**/*.{html,svg}',
 		entrypoint: 'src/index.html'
@@ -39,8 +40,10 @@ const PATHS = {
 	},
 	styles: 'src/**/*.scss',
 	validator: {
-		dest: 'build/validator/' + ENV,
-		entrypoint: `build/${ ENV }/index.html`
+		// dest: 'build/validator/' + ENV,
+		// entrypoint: `build/${ ENV }/index.html`
+		dest: 'build/validator',
+		entrypoint: 'build/index.html'
 	}
 };
 
@@ -50,7 +53,7 @@ const OPTIONS_BROWSERIFY = {
 	transform: [ ['babelify'] ]
 };
 const OPTIONS_CONNECT = {
-	root: PATHS.dest.all
+	root: PATHS.dest
 };
 const OPTIONS_HTML_VALIDATOR = {
 	format: 'html'
@@ -87,13 +90,13 @@ gulp.task('build:markup', () => {
 		.pipe(vulcanize(OPTIONS_VULCANIZE))
 		.pipe(replace(' by-vulcanize=""', ''))
 		.pipe(ifProd(htmlmin, OPTIONS_HTMLMIN))
-		.pipe(gulp.dest(PATHS.dest.env));
+		.pipe(gulp.dest(PATHS.dest));
 });
 
 gulp.task('build:scripts:elements', () => {
 	return gulp.src(PATHS.scripts.elements)
 		.pipe(ifProd(babili))
-		.pipe(gulp.dest(PATHS.dest.env));
+		.pipe(gulp.dest(PATHS.dest));
 });
 
 gulp.task('build:scripts:modules', () => {
@@ -104,7 +107,7 @@ gulp.task('build:scripts:modules', () => {
 		.pipe(ifProd(babili))
 		.on('error', util.log)
 		.pipe(ifDev(sourcemaps.write))
-		.pipe(gulp.dest(PATHS.dest.env));
+		.pipe(gulp.dest(PATHS.dest));
 });
 
 gulp.task('build:styles', () => {
@@ -113,7 +116,7 @@ gulp.task('build:styles', () => {
 		.pipe(sass(OPTIONS_SASS).on('error', sass.logError))
 		.pipe(ifDev(sourcemaps.write))
 		.pipe(postcss([autoprefixer()]))
-		.pipe(gulp.dest(PATHS.dest.env));
+		.pipe(gulp.dest(PATHS.dest));
 });
 
 gulp.task('build:watch', ['build', 'serve'], () => {

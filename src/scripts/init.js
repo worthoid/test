@@ -5,9 +5,13 @@ function init(window) {
 	const CUSTOM_ELEMENTS = [ DemoClock ];
 	/* eslint-enable no-undef */
 
-	window.setTimeout(() => defineElements(window, CUSTOM_ELEMENTS), 1);
+	defineElements(window, CUSTOM_ELEMENTS);
 }
 
 export default window => {
-	window.addEventListener('DOMContentLoaded', () => init(window), { once: true });
+	// window.addEventListener('DOMContentLoaded', () => window.setTimeout(init, 1, window), { once: true });
+	window.document.body.querySelector('button').addEventListener('click', event => {
+		event.target.disabled = true;
+		init(window);
+	}, { once: true });
 };
