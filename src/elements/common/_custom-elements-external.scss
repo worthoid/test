@@ -1,0 +1,9 @@
+%custom-element-defined {
+	transition-duration: 500ms;
+	transition-property: filter, opacity;
+}
+
+*:not(:defined) { // sass-lint:disable-line no-universal-selectors
+	filter: blur(5px);
+	opacity: 0;
+}

@@ -1,0 +1,30 @@
+@import "demo-clock-variables";
+
+demo-clock {
+	// --demo-clock-stroke-linecap: initial;
+
+	// --demo-clock-hour-hand-color: inherit;
+	// --demo-clock-hour-hand-width: initial;
+
+	// --demo-clock-minute-hand-color: inherit;
+	// --demo-clock-minute-hand-width: initial;
+
+	// --demo-clock-second-hand-color: inherit;
+	// --demo-clock-second-hand-width: initial;
+
+	// --demo-clock-marker-color: inherit;
+	// --demo-clock-marker-width: initial;
+
+	&:defined {
+		@extend %custom-element-defined;
+	}
+
+	&:not(:defined) {
+		display: $demo-clock-display;
+		height: $demo-clock-height;
+		min-height: $demo-clock-min-height;
+		min-width: $demo-clock-min-width;
+		vertical-align: $demo-clock-vertical-align;
+		width: $demo-clock-width;
+	}
+}

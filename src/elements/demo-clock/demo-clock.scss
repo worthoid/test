@@ -1,0 +1,89 @@
+@import "../base/custom-element-base";
+@import "demo-clock-variables";
+
+$border-radius: 50%;
+$border-width: 1px;
+$padding-width: 1px;
+
+$content-height: $demo-clock-min-height - $border-width * 2 - $padding-width * 2;
+$content-width: $demo-clock-min-width - $border-width * 2 - $padding-width * 2;
+
+$stroke-linecap: round;
+
+$marker-width: 0;
+
+$hour-hand-width: 1.75;
+$minute-hand-width: initial;
+$second-hand-color: #f00;
+$second-hand-width: 0.25;
+
+@keyframes rotation {
+	to {
+		transform: rotate(1turn);
+	}
+}
+
+:host {
+	border: $border-width solid;
+	border-radius: $border-radius;
+	cursor: pointer;
+	display: $demo-clock-display;
+	height: $demo-clock-height;
+	min-height: $content-height;
+	min-width: $content-width;
+	padding: $padding-width;
+	user-select: none;
+	vertical-align: $demo-clock-vertical-align;
+	width: $demo-clock-width;
+}
+
+:host([paused]) line {
+	animation-play-state: paused;
+}
+
+svg {
+	display: block;
+	fill: none;
+	// height: 100%; // NOTE: causes incorrect sizing issue in Safari
+	overflow: visible;
+	stroke: currentColor;
+	stroke-linecap: var(--demo-clock-stroke-linecap, $stroke-linecap);
+}
+
+line {
+	vector-effect: non-scaling-stroke;
+}
+
+.marker {
+	stroke: var(--demo-clock-marker-color);
+	stroke-width: var(--demo-clock-marker-width, $marker-width);
+}
+
+.hand {
+	animation: rotation infinite;
+	transform-origin: center $content-height / 2;
+}
+
+.hour,
+.minute {
+	animation-timing-function: linear;
+}
+
+.hour {
+	animation-duration: 12 * 60 * 60s;
+	stroke: var(--demo-clock-hour-hand-color);
+	stroke-width: var(--demo-clock-hour-hand-width, $hour-hand-width);
+}
+
+.minute {
+	animation-duration: 60 * 60s;
+	stroke: var(--demo-clock-minute-hand-color);
+	stroke-width: var(--demo-clock-minute-hand-width, $minute-hand-width);
+}
+
+.second {
+	animation-duration: 60s;
+	animation-timing-function: steps(60);
+	stroke: var(--demo-clock-second-hand-color, $second-hand-color);
+	stroke-width: var(--demo-clock-second-hand-width, $second-hand-width);
+}

@@ -1,0 +1,8 @@
+:host {
+	contain: content;
+	overflow: hidden;
+}
+
+:host([disabled]) {
+	cursor: not-allowed;
+}

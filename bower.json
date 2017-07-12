@@ -1,0 +1,22 @@
+{
+  "name": "custom-elements-test",
+  "description": "Custom Elements Test.",
+  "main": "index.js",
+  "authors": [
+    "Ben Worthington <ben.worthington@>"
+  ],
+  "license": "MIT",
+  "keywords": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "build",
+    "test"
+  ],
+  "dependencies": {
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.1"
+  }
+}
