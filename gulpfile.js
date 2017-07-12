@@ -170,11 +170,11 @@ gulp.task('tdd:single', done => {
 });
 
 gulp.task('test', done => {
-	runSequence('lint', 'validate:markup', 'tdd:single', done);
+	runSequence('lint', 'tdd:single', done);
 });
 
 gulp.task('test:watch', ['test', 'serve'], () => {
-	gulp.watch(PATHS.markup.all, ['lint:markup', 'validate:markup']);
+	gulp.watch(PATHS.markup.all, ['lint:markup']);
 	gulp.watch(PATHS.scripts.all, ['lint:scripts', 'tdd:single']);
 	gulp.watch(PATHS.styles, ['lint:styles']);
 });
