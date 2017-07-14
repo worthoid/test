@@ -36,6 +36,7 @@ const PATHS = {
 		all: 'src/**/*.{html,svg}',
 		entrypoint: 'src/index.html'
 	},
+	public: 'src/public/**/*',
 	scripts: {
 		all: ['*.js', 'src/**/*.js', 'test/**/*.js'],
 		dest: 'main.js',
@@ -88,13 +89,19 @@ function ifProd(fn, ...args) {
 	return util.env.production ? fn.apply(null, args) : util.noop();
 }
 
-gulp.task('build', ['build:markup', 'build:scripts:elements', 'build:scripts:modules', 'build:styles']);
+gulp.task('build', ['build:markup', 'build:public', 'build:scripts:elements', 'build:scripts:modules', 'build:styles']);
 
 gulp.task('build:markup', () => {
 	return gulp.src(PATHS.markup.entrypoint)
 		.pipe(vulcanize(OPTIONS_VULCANIZE))
 		.pipe(replace(' by-vulcanize=""', ''))
 		.pipe(ifProd(htmlmin, OPTIONS_HTMLMIN))
+		.pipe(gulp.dest(PATHS.dest.all));
+});
+
+gulp.task('build:public', () => {
+	return gulp.src(PATHS.public)
+		// .pipe(ifProd(minify))
 		.pipe(gulp.dest(PATHS.dest.all));
 });
 
@@ -130,6 +137,7 @@ gulp.task('build:styles', () => {
 
 gulp.task('build:watch', ['build', 'serve'], () => {
 	gulp.watch(PATHS.markup.all, ['build:markup']);
+	gulp.watch(PATHS.public, ['build:public']);
 	gulp.watch(PATHS.scripts.elements, ['build:scripts:elements']);
 	gulp.watch(PATHS.scripts.modules, ['build:scripts:modules']);
 	gulp.watch(PATHS.styles, ['build:styles']);

@@ -1,6 +1,7 @@
 # custom-elements-test
 
 [![Build Status](https://travis-ci.org/worthoid/test.svg?branch=master)](https://travis-ci.org/worthoid/test)
+[![devDependency Status](https://david-dm.org/worthoid/test.svg)](https://david-dm.org/worthoid/test#info=devDependencies)
 
 * [Demo](https://worthoid.github.io/test)
 * [Test Report](https://worthoid.github.io/test/reports/ChromeHeadless)
