@@ -18,9 +18,18 @@ body {
 	min-height: 100%;
 }
 
+header {
+	padding: 12px;
+}
+
 main {
 	flex: 1;
 	padding: 12px;
+}
+
+h1 {
+	font-size: inherit;
+	font-weight: normal;
 }
 
 demo-clock:not(:first-child) {
