@@ -1,4 +1,4 @@
-const BROWSER = 'ChromeHeadless';
+const CHROME_HEADLESS = 'ChromeHeadless';
 
 module.exports = config => {
 	config.set({
@@ -9,9 +9,9 @@ module.exports = config => {
 				// ['browserify-istanbul']
 			]
 		},
-		browsers: [BROWSER],
+		browsers: [CHROME_HEADLESS],
 		coverageReporter: {
-			dir: `dist/reports/${ BROWSER }/coverage`,
+			dir: `dist/reports/${ CHROME_HEADLESS }/coverage`,
 			reporters: [
 				{ type: 'html' },
 				{ type: 'text-summary' }
@@ -22,7 +22,7 @@ module.exports = config => {
 		frameworks: ['browserify', 'mocha', 'sinon-chai'],
 		htmlReporter: {
 			outputDir: 'dist/reports',
-			reportName: BROWSER
+			reportName: CHROME_HEADLESS
 		},
 		preprocessors: {
 			'src/elements/**/*.js': ['coverage'],
