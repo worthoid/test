@@ -50,7 +50,7 @@ describe('DemoClock', () => {
 			customElements.whenDefined(LOCAL_NAME).then(() => {
 				// demoClock = new DemoClock();
 				demoClock = document.createElement(LOCAL_NAME);
-				console.log('DONE');
+				// console.log('DONE');
 				done();
 			});
 		});
@@ -97,7 +97,7 @@ describe('DemoClock', () => {
 
 		describe('#getTime()', () => {
 			before(() => {
-				console.log('DOING');
+				// console.log('DOING');
 				demoClock = document.createElement(LOCAL_NAME);
 			});
 
@@ -111,7 +111,7 @@ describe('DemoClock', () => {
 
 			it('should return a local time string when connected', () => {
 				document.body.appendChild(demoClock);
-				console.log(demoClock.getTime());
+				// console.log(demoClock.getTime());
 				expect(demoClock.getTime()).to.match(REGEX_LOCALE_TIME);
 			});
 		});

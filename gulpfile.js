@@ -1,10 +1,11 @@
 const autoprefixer = require('autoprefixer');
 const browserify = require('browserify');
+const del = require('del');
 const gulp = require('gulp');
 const babili = require('gulp-babili');
 const connect = require('gulp-connect');
 const eslint = require('gulp-eslint');
-const htmlValidator = require('gulp-html-validator');
+// const htmlValidator = require('gulp-html-validator');
 const htmlhint = require('gulp-htmlhint');
 const htmlmin = require('gulp-htmlmin');
 const postcss = require('gulp-postcss');
@@ -14,7 +15,8 @@ const sassLint = require('gulp-sass-lint');
 const sourcemaps = require('gulp-sourcemaps');
 const util = require('gulp-util');
 const vulcanize = require('gulp-vulcanize');
-const runSequence = require('run-sequence');
+const merge = require('merge-stream');
+const run = require('run-sequence');
 const buffer = require('vinyl-buffer');
 const sourceStream = require('vinyl-source-stream');
 
@@ -26,25 +28,28 @@ const PATHS = {
 	// 	all: 'build',
 	// 	env: 'build/' + ENV
 	// },
-	dest: 'build',
+	dest: {
+		all: 'dist',
+		reports: 'dist/reports'
+	},
 	markup: {
 		all: 'src/**/*.{html,svg}',
 		entrypoint: 'src/index.html'
 	},
 	scripts: {
 		all: ['*.js', 'src/**/*.js', 'test/**/*.js'],
-		dest: 'scripts/main.js',
+		dest: 'main.js',
 		elements: 'src/!(scripts)/**/*.js',
 		entrypoint: 'src/scripts/main.js',
 		modules: 'src/scripts/**/*.js'
 	},
-	styles: 'src/**/*.scss',
-	validator: {
-		// dest: 'build/validator/' + ENV,
-		// entrypoint: `build/${ ENV }/index.html`
-		dest: 'build/validator',
-		entrypoint: 'build/index.html'
-	}
+	styles: ['src/!(styles)/**/*.scss', 'src/styles/main.scss']
+	// validator: {
+	// 	// dest: 'build/validator/' + ENV,
+	// 	// entrypoint: `build/${ ENV }/index.html`
+	// 	dest: 'dist/validator',
+	// 	entrypoint: 'dist/index.html'
+	// }
 };
 
 const OPTIONS_BROWSERIFY = {
@@ -53,11 +58,11 @@ const OPTIONS_BROWSERIFY = {
 	transform: [ ['babelify'] ]
 };
 const OPTIONS_CONNECT = {
-	root: PATHS.dest
+	root: PATHS.dest.all
 };
-const OPTIONS_HTML_VALIDATOR = {
-	format: 'html'
-};
+// const OPTIONS_HTML_VALIDATOR = {
+// 	format: 'html'
+// };
 const OPTIONS_HTMLMIN = {
 	collapseWhitespace: true,
 	minifyCSS: true,
@@ -73,7 +78,7 @@ const OPTIONS_VULCANIZE = {
 	stripComments: true
 };
 
-const VALIDATOR_URL = '//validator.w3.org/nu';
+// const VALIDATOR_URL = '//validator.w3.org/nu';
 
 function ifDev(fn, ...args) {
 	return util.env.production ? util.noop() : fn.apply(null, args);
@@ -90,13 +95,13 @@ gulp.task('build:markup', () => {
 		.pipe(vulcanize(OPTIONS_VULCANIZE))
 		.pipe(replace(' by-vulcanize=""', ''))
 		.pipe(ifProd(htmlmin, OPTIONS_HTMLMIN))
-		.pipe(gulp.dest(PATHS.dest));
+		.pipe(gulp.dest(PATHS.dest.all));
 });
 
 gulp.task('build:scripts:elements', () => {
 	return gulp.src(PATHS.scripts.elements)
 		.pipe(ifProd(babili))
-		.pipe(gulp.dest(PATHS.dest));
+		.pipe(gulp.dest(PATHS.dest.all));
 });
 
 gulp.task('build:scripts:modules', () => {
@@ -107,16 +112,20 @@ gulp.task('build:scripts:modules', () => {
 		.pipe(ifProd(babili))
 		.on('error', util.log)
 		.pipe(ifDev(sourcemaps.write))
-		.pipe(gulp.dest(PATHS.dest));
+		.pipe(gulp.dest(PATHS.dest.all));
 });
 
 gulp.task('build:styles', () => {
-	return gulp.src(PATHS.styles)
-		.pipe(ifDev(sourcemaps.init))
-		.pipe(sass(OPTIONS_SASS).on('error', sass.logError))
-		.pipe(ifDev(sourcemaps.write))
-		.pipe(postcss([autoprefixer()]))
-		.pipe(gulp.dest(PATHS.dest));
+	const tasks = PATHS.styles.map(path => {
+		return gulp.src(path)
+			.pipe(ifDev(sourcemaps.init))
+			.pipe(sass(OPTIONS_SASS).on('error', sass.logError))
+			.pipe(postcss([autoprefixer()]))
+			.pipe(ifDev(sourcemaps.write))
+			.pipe(gulp.dest(PATHS.dest.all));
+	});
+
+	return merge(tasks);
 });
 
 gulp.task('build:watch', ['build', 'serve'], () => {
@@ -126,13 +135,17 @@ gulp.task('build:watch', ['build', 'serve'], () => {
 	gulp.watch(PATHS.styles, ['build:styles']);
 });
 
-gulp.task('default', ['dev']);
+gulp.task('clean', () => del(PATHS.dest.all));
 
-gulp.task('dev', ['build:watch']);
+gulp.task('clean:reports', () => del(PATHS.dest.reports));
 
-gulp.task('lint', done => {
-	runSequence('lint:markup', 'lint:scripts', 'lint:styles', done);
-});
+gulp.task('default', done => run('clean', 'build', done));
+
+gulp.task('deploy', done => run('test', 'build', done));
+
+gulp.task('dev', done => run('clean', 'build:watch', done));
+
+gulp.task('lint', done => run('lint:markup', 'lint:scripts', 'lint:styles', done));
 
 gulp.task('lint:markup', () => {
 	return gulp.src(PATHS.markup.all)
@@ -152,19 +165,21 @@ gulp.task('lint:styles', () => {
 		.pipe(sassLint.format());
 });
 
-gulp.task('serve', () => {
-	connect.server(OPTIONS_CONNECT);
+gulp.task('lint:watch', ['lint'], () => {
+	gulp.watch(PATHS.markup.all, ['lint:markup']);
+	gulp.watch(PATHS.scripts.all, ['lint:scripts']);
+	gulp.watch(PATHS.styles, ['lint:styles']);
 });
 
-gulp.task('tdd', done => {
+gulp.task('serve', () => connect.server(OPTIONS_CONNECT));
+
+gulp.task('tdd', ['clean:reports'], done => {
 	new Server({
 		configFile: __dirname + '/karma.conf.js'
 	}, () => done()).start();
 });
 
-// gulp.task('tdd:serve', ['tdd', 'serve']);
-
-gulp.task('tdd:single', done => {
+gulp.task('test', ['clean:reports', 'lint'], done => {
 	new Server({
 		autoWatch: false,
 		configFile: __dirname + '/karma.conf.js',
@@ -172,19 +187,15 @@ gulp.task('tdd:single', done => {
 	}, () => done()).start();
 });
 
-gulp.task('test', done => { // prod only
-	runSequence('lint', 'validate', 'tdd:single', done);
-});
+// gulp.task('test:watch', ['build', 'serve', 'test'], () => {
+// 	gulp.watch(PATHS.markup.all, ['lint:markup']);
+// 	gulp.watch(PATHS.scripts.all, ['lint:scripts', 'tdd:single']); // ??
+// 	gulp.watch(PATHS.styles, ['lint:styles']);
+// });
 
-gulp.task('test:watch', ['test', 'serve'], () => {
-	gulp.watch(PATHS.markup.all, ['lint:markup']);
-	gulp.watch(PATHS.scripts.all, ['lint:scripts', 'tdd:single']);
-	gulp.watch(PATHS.styles, ['lint:styles']);
-});
-
-gulp.task('validate', ['build'], () => {
-	return gulp.src(PATHS.validator.entrypoint)
-		.pipe(htmlValidator(OPTIONS_HTML_VALIDATOR))
-		.pipe(replace(/href="(?!http)/g, `href="${ VALIDATOR_URL }/`))
-		.pipe(gulp.dest(PATHS.validator.dest));
-});
+// gulp.task('validate', ['build'], () => {
+// 	return gulp.src(PATHS.validator.entrypoint)
+// 		.pipe(htmlValidator(OPTIONS_HTML_VALIDATOR))
+// 		.pipe(replace(/href="(?!http)/g, `href="${ VALIDATOR_URL }/`))
+// 		.pipe(gulp.dest(PATHS.validator.dest));
+// });

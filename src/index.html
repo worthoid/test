@@ -4,19 +4,23 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"/>
 	<title>Custom Elements Test</title>
-	<link rel="stylesheet" href="styles/main.css"/>
+	<link rel="stylesheet" href="main.css"/>
 	<link rel="import" href="elements/demo-clock/demo-clock.html"/>
 </head>
 <body>
-	<h1 hidden>Custom Elements Test</h1>
+	<header>
+		<h1 hidden="">Custom Elements Test</h1>
+	</header>
 
-	<demo-clock value="0"></demo-clock><demo-clock></demo-clock>
+	<main>
+		<demo-clock value="0"></demo-clock><demo-clock></demo-clock>
 
-	<div>
-		<button>Define</button>
-	</div>
+		<div>
+			<button>Define</button>
+		</div>
+	</main>
 
-	<script src="scripts/main.js"></script>
+	<script src="main.js"></script>
 	<script>
 		init();
 	</script>

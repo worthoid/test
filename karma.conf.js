@@ -1,34 +1,41 @@
+const BROWSER = 'ChromeHeadless';
+
 module.exports = config => {
 	config.set({
 		browserify: {
 			debug: true,
 			transform: [
 				['babelify'],
-				['browserify-istanbul']
+				// ['browserify-istanbul']
 			]
 		},
-		browsers: ['ChromeHeadless'],
+		browsers: [BROWSER],
 		coverageReporter: {
-			dir: 'build/coverage',
+			dir: `dist/reports/${ BROWSER }/coverage`,
 			reporters: [
 				{ type: 'html' },
 				{ type: 'text-summary' }
-			]
+			],
+			subdir: '.' // browser => browser.toLowerCase().split(/[ /-]/)[0]
 		},
 		files: ['src/**/*.js', 'test/**/*.js'],
 		frameworks: ['browserify', 'mocha', 'sinon-chai'],
+		htmlReporter: {
+			outputDir: 'dist/reports',
+			reportName: BROWSER
+		},
 		preprocessors: {
 			'src/elements/**/*.js': ['coverage'],
 			'src/scripts/**/*.js': ['browserify'],
 			'test/**/*.js': ['browserify']
 		},
-		reporters: ['coverage', 'mocha']
+		reporters: ['coverage', 'html', 'mocha']
 	});
 };
 
 // module.exports = config => {
 // 	config.set({
-// 		basePath: 'build',
+// 		basePath: 'dist',
 // 		browserify: {
 // 			debug: true,
 // 			transform: [ ['babelify', { presets: 'es2015' }] ]
