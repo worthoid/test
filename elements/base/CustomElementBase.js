@@ -1,0 +1,1 @@
+class CustomElementBase extends HTMLElement{appendTemplateToShadow(a='open'){const b=this.ownerDocument.body.querySelector('.template-'+this.localName);this.attachShadow({mode:a}).appendChild(this.ownerDocument.importNode(b.content,!0))}reflectBooleanPropToAttr(a,b){b?this.setAttribute(a,''):this.removeAttribute(a)}}
